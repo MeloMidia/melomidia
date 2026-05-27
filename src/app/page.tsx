@@ -36,7 +36,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const navItems = ["Servicos", "Resultados", "Sobre"];
+const navItems = [
+  { label: "Serviços", href: "#operacao-digital" },
+  { label: "Resultados", href: "#resultados" },
+  { label: "Sobre", href: "#sobre" },
+];
 const sidebarItems = ["Home", "Vendas", "Analytics", "Produtos"];
 
 const painPoints = [
@@ -169,26 +173,23 @@ export default function Home() {
         </motion.div>
 
         <header className="mx-auto mt-6 flex h-14 max-w-5xl items-center justify-between rounded-md border border-white/5 bg-black/10 px-1 backdrop-blur-md sm:mt-8">
-          <a className="flex items-center gap-2 px-1 text-2xl font-semibold tracking-[-0.03em]" href="#">
-            Melo Midia
-            <span className="grid size-5 place-items-center rounded-[7px] border-2 border-[#f4c95d]">
-              <span className="size-1.5 rounded-full bg-[#f4c95d]" />
-            </span>
+          <a className="flex items-center gap-2 px-3" href="#">
+            <img src="/logo.png" alt="Melo Midia" className="h-10 w-10 rounded-full object-cover" />
           </a>
 
           <nav className="hidden items-center gap-9 text-sm font-semibold text-white/74 md:flex">
             {navItems.map((item) => (
-              <a key={item} className="transition hover:text-white" href="#">
-                {item}
+              <a key={item.label} className="transition hover:text-white" href={item.href}>
+                {item.label}
               </a>
             ))}
-            <a className="flex items-center gap-2 transition hover:text-white" href="#">
-              Auto pecas <ChevronDown className="size-3.5" />
-            </a>
+            <button className="flex items-center gap-2 transition hover:text-white" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
+              Auto peças <ChevronDown className="size-3.5" />
+            </button>
           </nav>
 
           <div className="hidden md:block">
-            <Button variant="secondary" className="h-10 rounded-md px-5">
+            <Button variant="secondary" className="h-10 rounded-md px-5" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
               Falar com especialista
             </Button>
           </div>
@@ -218,8 +219,8 @@ export default function Home() {
             className="mt-12 flex flex-col items-center gap-5"
           >
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Button className="h-11 rounded-md px-6">Quero vender para todo o Brasil</Button>
-              <Button variant="secondary" className="h-11 rounded-md px-6">
+              <Button className="h-11 rounded-md px-6" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>Quero vender para todo o Brasil</Button>
+              <Button variant="secondary" className="h-11 rounded-md px-6" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
                 Falar com um especialista <ArrowRight className="size-4" />
               </Button>
             </div>
@@ -251,7 +252,7 @@ export default function Home() {
 
 function SalesLeakSection() {
   return (
-    <section className="relative isolate overflow-hidden px-4 py-24 sm:px-6 sm:py-28 lg:px-8">
+    <section id="sobre" className="relative isolate overflow-hidden px-4 py-24 sm:px-6 sm:py-28 lg:px-8">
       <AnimatedSalesBackground />
 
       <div className="relative mx-auto max-w-6xl">
@@ -476,7 +477,7 @@ function DiagnosticPanel() {
       </div>
 
       <div className="relative mt-auto pt-6">
-        <Button className="h-11 w-full rounded-md">
+        <Button className="h-11 w-full rounded-md" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
           Quero encontrar essas perdas <ArrowRight className="size-4" />
         </Button>
       </div>
@@ -555,7 +556,7 @@ function DigitalOperationSection() {
                 ))}
               </div>
               <div className="mt-8 border-t border-white/10 pt-6">
-                <Button className="h-11 rounded-md px-5">
+                <Button className="h-11 rounded-md px-5" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
                   Quero estruturar minha operação agora <ArrowRight className="size-4" />
                 </Button>
               </div>
@@ -588,7 +589,7 @@ function OperationStep({ step, index }: { step: OperationStep; index: number }) 
 
 function SocialProofSection() {
   return (
-    <section className="relative isolate overflow-hidden px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+    <section id="resultados" className="relative isolate overflow-hidden px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
       <div className="absolute inset-0 -z-20 bg-[linear-gradient(180deg,#030304_0%,#07080b_50%,#030304_100%)]" />
       <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
       <div className="absolute left-1/2 top-12 -z-10 h-[440px] w-[80vw] -translate-x-1/2 bg-[radial-gradient(circle,rgba(244,201,93,0.12),transparent_60%)] blur-3xl" />
@@ -704,182 +705,203 @@ function SocialProofCounter({ stat, index }: { stat: SocialProofStat; index: num
   );
 }
 function DashboardMockup() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+  const [mouseX, setMouseX] = useState(0.5);
+  const [mouseY, setMouseY] = useState(0.5);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    
+    // Normalized coordinates from -0.5 to 0.5
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    
+    // Smooth out rotation (max 12 degrees tilt)
+    setRotateX(-y * 12);
+    setRotateY(x * 12);
+    setMouseX(x + 0.5);
+    setMouseY(y + 0.5);
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setRotateX(0);
+    setRotateY(0);
+    setMouseX(0.5);
+    setMouseY(0.5);
+  };
+
   return (
-    <div className="relative mx-auto rounded-[34px] border border-white/10 bg-[#111217]/85 p-4 shadow-[0_36px_130px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.08)] sm:p-8">
-      <div className="overflow-hidden rounded-[18px] border-[6px] border-[#252932] bg-[#050609] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-        <div className="flex h-10 items-center gap-2 bg-[#23262b] px-4">
-          <span className="size-2 rounded-full bg-white/24" />
-          <span className="size-2 rounded-full bg-white/24" />
-          <span className="size-2 rounded-full bg-white/24" />
-        </div>
+    <div
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className="relative mx-auto w-full cursor-pointer select-none"
+      style={{
+        perspective: "1500px",
+      }}
+    >
+      {/* Background radial glow */}
+      <motion.div
+        className="absolute -inset-10 -z-10 rounded-full bg-gradient-to-r from-amber-500/10 via-[#2f6dff]/15 to-red-500/10 opacity-70 blur-3xl"
+        animate={isHovered ? {
+          x: (mouseX - 0.5) * 40,
+          y: (mouseY - 0.5) * 40,
+          scale: 1.1,
+        } : {
+          x: 0,
+          y: 0,
+          scale: 1,
+        }}
+        transition={{ type: "spring", stiffness: 150, damping: 25 }}
+      />
 
-        <div className="grid min-h-[390px] grid-cols-[148px_1fr] bg-[#06070a] text-white sm:grid-cols-[190px_1fr]">
-          <MockupSidebar />
-          <div className="overflow-hidden p-4 sm:p-6">
-            <div className="mb-5 flex items-center justify-between gap-4">
-              <div>
-                <h2 className="text-xl font-semibold tracking-[-0.04em]">Analytics</h2>
-                <p className="mt-1 text-xs text-white/42">Performance da loja no Mercado Livre</p>
-              </div>
-              <div className="hidden gap-2 sm:flex">
-                <button className="h-8 rounded-md border border-white/10 bg-white/[0.04] px-3 text-[11px] text-white/72">
-                  Ultimos 7 dias
-                </button>
-                <button className="h-8 rounded-md border border-white/10 bg-white/[0.04] px-3 text-[11px] text-white/72">
-                  Comparar periodo
-                </button>
-              </div>
-            </div>
+      {/* Main Mockup Card */}
+      <motion.div
+        className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#050609]/95 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.08)]"
+        style={{
+          transformStyle: "preserve-3d",
+        }}
+        animate={isHovered ? {
+          rotateX: rotateX,
+          rotateY: rotateY,
+          scale: 1.02,
+        } : {
+          rotateX: [0, 1.5, 0, -1.5, 0],
+          rotateY: [0, -2, 0, 2, 0],
+          y: [0, -8, 0],
+          scale: 1,
+        }}
+        transition={isHovered ? {
+          type: "spring",
+          stiffness: 250,
+          damping: 25,
+        } : {
+          y: {
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut",
+          },
+          rotateX: {
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          },
+          rotateY: {
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }
+        }}
+      >
+        {/* Glass sheen overlay */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none z-30"
+          style={{
+            background: `radial-gradient(circle 350px at ${mouseX * 100}% ${mouseY * 100}%, rgba(255, 255, 255, 0.08), transparent 80%)`,
+          }}
+          animate={{ opacity: isHovered ? 1 : 0.25 }}
+          transition={{ duration: 0.3 }}
+        />
 
-            <div className="grid min-w-[720px] grid-cols-3 gap-3">
-              <DarkChartCard />
-              <DarkMetricCard metric={metrics[0]} />
-              <DarkMetricCard metric={metrics[1]} />
-              <DarkListCard />
-              <DarkMetricCard metric={metrics[3]} />
-              <DarkChartCard compact />
-              <DarkMetricCard metric={metrics[5]} />
-              <DarkListCard />
-              <DarkMetricCard metric={metrics[6]} />
-            </div>
+        {/* Browser Top Bar */}
+        <div className="flex h-11 items-center justify-between border-b border-white/10 bg-white/[0.02] px-4">
+          <div className="flex gap-2">
+            <span className="size-2.5 rounded-full bg-red-500/40" />
+            <span className="size-2.5 rounded-full bg-yellow-500/40" />
+            <span className="size-2.5 rounded-full bg-green-500/40" />
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MockupSidebar() {
-  return (
-    <aside className="border-r border-white/10 bg-[#08080d]/95 p-4">
-      <div className="mb-5 flex items-center gap-2">
-        <div className="grid size-8 place-items-center rounded-full bg-[#ffe600]">
-          <div className="h-2 w-5 rounded-full border-2 border-[#123b8f]" />
-        </div>
-        <div className="text-left text-base font-black leading-[0.82] tracking-[-0.07em] text-[#ffe600] sm:text-lg">
-          mercado
-          <br />
-          livre
-        </div>
-      </div>
-
-      <div className="mb-5 rounded-md border border-white/10 bg-white/[0.03] p-2">
-        <div className="flex items-center gap-2">
-          <span className="grid size-7 place-items-center rounded-full bg-white text-[10px] font-bold text-black">ME</span>
-          <div className="min-w-0">
-            <div className="truncate text-xs font-semibold">Melo Midia</div>
-            <div className="truncate text-[10px] text-white/38">@mercadolivre</div>
+          <div className="flex h-6 w-1/3 items-center justify-center rounded bg-white/[0.04] px-3 text-[10px] text-white/30 tracking-wider">
+            melomidia.com.br/dashboard
           </div>
+          <div className="size-3.5" />
         </div>
-        <button className="mt-3 h-7 w-full rounded-md border border-white/10 bg-black/20 text-[10px] text-white/62">
-          + Nova analise
-        </button>
-      </div>
 
-      <nav className="space-y-1">
-        {sidebarItems.map((item) => (
-          <div
-            key={item}
-            className={cn(
-              "flex h-8 items-center gap-2 rounded-md px-2 text-[11px] font-medium text-white/62",
-              item === "Analytics" && "bg-white/[0.12] text-white",
-            )}
-          >
-            {item === "Home" ? <HomeIcon className="size-3.5" /> : <PanelLeft className="size-3.5" />}
-            {item}
-          </div>
-        ))}
-      </nav>
-
-      <div className="mt-48 hidden space-y-1 text-[11px] text-white/56 sm:block">
-        <div className="flex items-center gap-2">
-          <Bell className="size-3.5" /> Ajuda
-        </div>
-        <div className="flex items-center gap-2">
-          <Sparkles className="size-3.5" /> Assistente
-        </div>
-      </div>
-    </aside>
-  );
-}
-
-function DarkChartCard({ compact }: { compact?: boolean }) {
-  return (
-    <div className="rounded-lg border border-white/10 bg-[#090a0f] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-      <div className="mb-3 flex items-center justify-between">
-        <div>
-          <div className="text-[11px] text-white/45">{compact ? "Visitas" : "Vendas brutas"}</div>
-          <div className="flex items-center gap-2 text-xl font-semibold tracking-[-0.04em]">
-            {compact ? "49.512" : "R$ 265.798"}
-            <span className="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] text-emerald-400">+33%</span>
-          </div>
-        </div>
-        <span className="rounded border border-white/10 p-1 text-white/40">
-          <PanelLeft className="size-3.5" />
-        </span>
-      </div>
-      <div className="relative h-24">
-        {[18, 45, 72, 99, 126].map((top) => (
-          <span key={top} className="absolute left-0 right-0 border-t border-dashed border-white/[0.07]" style={{ top }} />
-        ))}
-        <svg className="absolute inset-0 h-full w-full overflow-visible" viewBox="0 0 260 140" preserveAspectRatio="none">
-          <path
-            d={compact ? "M0 98 L45 78 L90 84 L135 48 L180 40 L260 18" : "M0 110 L46 70 L90 72 L130 100 L174 44 L215 30 L260 8"}
-            fill="none"
-            stroke={compact ? "#10b981" : "#2f6dff"}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="3"
+        {/* Mockup Image */}
+        <div className="relative overflow-hidden">
+          <img
+            src="/mockup-hero.png"
+            alt="Melo Mídia Dashboard Mockup"
+            className="w-full h-auto object-cover select-none"
+            draggable={false}
           />
-        </svg>
-        <div className="absolute inset-x-0 bottom-0 flex justify-between text-[9px] text-white/35">
-          <span>1 dez.</span>
-          <span>1 fev.</span>
-          <span>1 maio.</span>
         </div>
-      </div>
-    </div>
-  );
-}
+      </motion.div>
 
-function DarkMetricCard({ metric }: { metric: Metric }) {
-  const Icon = metric.icon;
-
-  return (
-    <div className="rounded-lg border border-white/10 bg-[#090a0f] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-      <div className="mb-4 flex items-center justify-between">
-        <span className="grid size-9 place-items-center rounded-full bg-white/[0.06] text-[#ffe600]">
-          <Icon className="size-5" />
+      {/* Floating 3D layered element 1: Sales / Conversão */}
+      <motion.div
+        className="absolute -right-6 top-16 z-40 hidden rounded-xl border border-emerald-500/20 bg-emerald-950/90 p-4 shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-md sm:flex items-center gap-3"
+        animate={isHovered ? {
+          x: (mouseX - 0.5) * 60 + 10,
+          y: (mouseY - 0.5) * 60,
+          z: 80,
+        } : {
+          x: 0,
+          y: [-4, 4, -4],
+          z: 40,
+        }}
+        transition={isHovered ? {
+          type: "spring",
+          stiffness: 200,
+          damping: 25,
+        } : {
+          y: {
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }
+        }}
+      >
+        <span className="grid size-9 place-items-center rounded-full bg-emerald-500/20 text-emerald-400">
+          <TrendingUp className="size-5" />
         </span>
-        <span className={cn("text-[11px]", metric.trend === "down" ? "text-red-400" : "text-emerald-400")}>
-          {metric.change}
+        <div className="text-left">
+          <div className="text-[9px] uppercase tracking-wider text-emerald-400/80 font-bold">Conversão</div>
+          <div className="text-base font-extrabold text-white tracking-tight">+340%</div>
+        </div>
+      </motion.div>
+
+      {/* Floating 3D layered element 2: Ads status */}
+      <motion.div
+        className="absolute -left-10 bottom-20 z-40 hidden rounded-xl border border-amber-500/20 bg-black/90 p-4 shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-md sm:flex items-center gap-3"
+        animate={isHovered ? {
+          x: (mouseX - 0.5) * 80 - 10,
+          y: (mouseY - 0.5) * 80,
+          z: 100,
+        } : {
+          x: 0,
+          y: [4, -4, 4],
+          z: 50,
+        }}
+        transition={isHovered ? {
+          type: "spring",
+          stiffness: 180,
+          damping: 25,
+        } : {
+          y: {
+            duration: 5.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }
+        }}
+      >
+        <span className="grid size-9 place-items-center rounded-full bg-[#f4c95d]/10 text-[#f4c95d]">
+          <Sparkles className="size-5" />
         </span>
-      </div>
-      <div className="text-[11px] text-white/42">{metric.label}</div>
-      <div className="mt-2 text-xl font-semibold tracking-[-0.05em]">{metric.value}</div>
-    </div>
-  );
-}
-
-function DarkListCard() {
-  const rows = [
-    ["Kit embreagem", "24k", "45%"],
-    ["Farol dianteiro", "21k", "39.4%"],
-    ["Pastilha freio", "19k", "31.9%"],
-  ];
-
-  return (
-    <div className="rounded-lg border border-white/10 bg-[#090a0f] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-      <div className="mb-4 text-[11px] font-medium text-white/45">Top produtos</div>
-      <div className="space-y-3">
-        {rows.map(([name, amount, percent]) => (
-          <div key={name} className="grid grid-cols-[1fr_42px_42px] gap-2 border-b border-white/[0.06] pb-2 text-[11px] last:border-0">
-            <span className="truncate font-medium text-white/80">{name}</span>
-            <span className="text-white/55">{amount}</span>
-            <span className="text-white/55">{percent}</span>
-          </div>
-        ))}
-      </div>
+        <div className="text-left">
+          <div className="text-[9px] uppercase tracking-wider text-white/40 font-bold">Anúncios</div>
+          <div className="text-sm font-bold text-white">100% Otimizados</div>
+        </div>
+      </motion.div>
     </div>
   );
 }
@@ -1010,7 +1032,7 @@ function FinalCTASection() {
                   </div>
 
                   <div className="pt-2">
-                    <Button className="h-12 w-full rounded-lg px-6 text-base">
+                    <Button type="button" className="h-12 w-full rounded-lg px-6 text-base" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
                       Quero meu diagnóstico gratuito <ArrowRight className="size-4" />
                     </Button>
                   </div>

@@ -1001,7 +1001,7 @@ function DashboardMockup() {
 
       {/* Floating 3D layered element 1: Sales / Conversão */}
       <motion.div
-        className="absolute -right-6 top-16 z-40 hidden rounded-xl border border-emerald-500/20 bg-emerald-950/90 p-4 shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-md sm:flex items-center gap-3"
+        className="absolute right-2 sm:-right-6 top-16 z-40 flex rounded-xl border border-emerald-500/20 bg-emerald-950/90 p-3 sm:p-4 shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-md items-center gap-2 sm:gap-3"
         animate={isHovered ? {
           x: (mouseX - 0.5) * 60 + 10,
           y: (mouseY - 0.5) * 60,
@@ -1023,18 +1023,18 @@ function DashboardMockup() {
           }
         }}
       >
-        <span className="grid size-9 place-items-center rounded-full bg-emerald-500/20 text-emerald-400">
-          <TrendingUp className="size-5" />
+        <span className="grid size-8 sm:size-9 place-items-center rounded-full bg-emerald-500/20 text-emerald-400">
+          <TrendingUp className="size-4 sm:size-5" />
         </span>
         <div className="text-left">
-          <div className="text-[9px] uppercase tracking-wider text-emerald-400/80 font-bold">Conversão</div>
-          <div className="text-base font-extrabold text-white tracking-tight">+340%</div>
+          <div className="text-[8px] sm:text-[9px] uppercase tracking-wider text-emerald-400/80 font-bold">Conversão</div>
+          <div className="text-sm sm:text-base font-extrabold text-white tracking-tight">+340%</div>
         </div>
       </motion.div>
 
       {/* Floating 3D layered element 2: Ads status */}
       <motion.div
-        className="absolute -left-10 bottom-20 z-40 hidden rounded-xl border border-amber-500/20 bg-black/90 p-4 shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-md sm:flex items-center gap-3"
+        className="absolute left-2 sm:-left-10 bottom-20 z-40 flex rounded-xl border border-amber-500/20 bg-black/90 p-3 sm:p-4 shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-md items-center gap-2 sm:gap-3"
         animate={isHovered ? {
           x: (mouseX - 0.5) * 80 - 10,
           y: (mouseY - 0.5) * 80,
@@ -1056,12 +1056,12 @@ function DashboardMockup() {
           }
         }}
       >
-        <span className="grid size-9 place-items-center rounded-full bg-[#f4c95d]/10 text-[#f4c95d]">
-          <Sparkles className="size-5" />
+        <span className="grid size-8 sm:size-9 place-items-center rounded-full bg-[#f4c95d]/10 text-[#f4c95d]">
+          <Sparkles className="size-4 sm:size-5" />
         </span>
         <div className="text-left">
-          <div className="text-[9px] uppercase tracking-wider text-white/40 font-bold">Anúncios</div>
-          <div className="text-sm font-bold text-white">100% Otimizados</div>
+          <div className="text-[8px] sm:text-[9px] uppercase tracking-wider text-white/40 font-bold">Anúncios</div>
+          <div className="text-xs sm:text-sm font-bold text-white">100% Otimizados</div>
         </div>
       </motion.div>
     </div>

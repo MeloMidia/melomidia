@@ -146,6 +146,77 @@ const metrics = [
   { label: "Vendas canceladas", value: "163", change: "+3.975%", trend: "down", icon: XCircle },
 ];
 
+function TiltCard({ children, className }: { children: React.ReactNode; className?: string }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+  const [mouseX, setMouseX] = useState(0.5);
+  const [mouseY, setMouseY] = useState(0.5);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setRotateX(-y * 8); // Max 8 degrees tilt for sub-cards
+    setRotateY(x * 8);
+    setMouseX(x + 0.5);
+    setMouseY(y + 0.5);
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setRotateX(0);
+        setRotateY(0);
+      }}
+      className={cn("relative transition-all duration-300 ease-out", className)}
+      style={{
+        perspective: "1000px",
+      }}
+    >
+      <motion.div
+        className="relative h-full w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0b0c10]/90 shadow-[0_20px_50px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)]"
+        style={{
+          transformStyle: "preserve-3d",
+        }}
+        animate={isHovered ? {
+          rotateX,
+          rotateY,
+          scale: 1.015,
+        } : {
+          rotateX: [0, 0.5, 0, -0.5, 0],
+          rotateY: [0, -0.5, 0, 0.5, 0],
+          scale: 1,
+        }}
+        transition={isHovered ? {
+          type: "spring",
+          stiffness: 250,
+          damping: 25,
+        } : {
+          rotateX: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+          rotateY: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+        }}
+      >
+        {/* Dynamic Sheen glow */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none z-10 transition-opacity duration-300"
+          style={{
+            background: `radial-gradient(circle 180px at ${mouseX * 100}% ${mouseY * 100}%, rgba(255, 255, 255, 0.05), transparent 80%)`,
+          }}
+          animate={{ opacity: isHovered ? 1 : 0 }}
+        />
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
 export default function Home() {
   return (
     <main className="min-h-screen overflow-hidden bg-[#030304] text-white">
@@ -172,41 +243,41 @@ export default function Home() {
           </p>
         </motion.div>
 
-        <header className="mx-auto mt-6 flex h-14 max-w-5xl items-center justify-between rounded-md border border-white/5 bg-black/10 px-1 backdrop-blur-md sm:mt-8">
+        <header className="sticky top-4 z-50 mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full border border-white/10 bg-[#08080c]/60 px-4 backdrop-blur-xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.08)]">
           <a className="flex items-center gap-2 px-3" href="#">
-            <img src="/logo.png" alt="Melo Midia" className="h-10 w-10 rounded-full object-cover" />
+            <img src="/logo.png" alt="Melo Midia" className="h-9 w-9 rounded-full object-cover border border-white/20" />
           </a>
 
-          <nav className="hidden items-center gap-9 text-sm font-semibold text-white/74 md:flex">
+          <nav className="hidden items-center gap-8 text-xs font-bold uppercase tracking-wider text-white/60 md:flex">
             {navItems.map((item) => (
-              <a key={item.label} className="transition hover:text-white" href={item.href}>
+              <a key={item.label} className="relative py-1 transition-colors hover:text-white after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-[#f4c95d] after:transition-all hover:after:w-full" href={item.href}>
                 {item.label}
               </a>
             ))}
-            <button className="flex items-center gap-2 transition hover:text-white" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
-              Auto peças <ChevronDown className="size-3.5" />
+            <button className="flex items-center gap-1.5 transition hover:text-white uppercase tracking-wider" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
+              Auto peças <ChevronDown className="size-3" />
             </button>
           </nav>
 
           <div className="hidden md:block">
-            <Button variant="secondary" className="h-10 rounded-md px-5" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
+            <Button variant="secondary" className="h-9 rounded-full px-5 text-xs font-bold border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
               Falar com especialista
             </Button>
           </div>
-          <Button variant="secondary" size="icon" className="md:hidden" aria-label="Open menu">
+          <Button variant="secondary" size="icon" className="md:hidden rounded-full" aria-label="Open menu">
             <Menu className="size-5" />
           </Button>
         </header>
 
-        <div className="mx-auto flex max-w-6xl flex-col items-center pt-24 text-center sm:pt-28 lg:pt-32">
+        <div className="mx-auto flex max-w-6xl flex-col items-center pt-20 text-center sm:pt-24 lg:pt-28">
           <motion.h1
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, delay: 0.12, ease: "easeOut" }}
-            className="max-w-5xl text-balance text-5xl font-semibold leading-[0.98] tracking-[-0.055em] text-white drop-shadow-[0_7px_0_rgba(255,255,255,0.22)] sm:text-7xl lg:text-[86px]"
+            className="max-w-5xl text-balance text-5xl font-display font-extrabold leading-[0.95] tracking-[-0.04em] text-white sm:text-7xl lg:text-[84px]"
           >
             Acelere suas vendas de{" "}
-            <span className="font-script inline-block px-1 text-[1.08em] font-medium italic tracking-[-0.07em] text-white/95 drop-shadow-[0_5px_0_rgba(255,255,255,0.14)]">
+            <span className="font-script inline-block px-1 text-[1.08em] font-medium italic tracking-normal bg-gradient-to-r from-[#f4c95d] via-[#ffe600] to-[#f4c95d] bg-clip-text text-transparent drop-shadow-[0_4px_12px_rgba(244,201,93,0.15)]">
               autopeças
             </span>{" "}
             no Mercado Livre sem dor de cabeça.
@@ -216,15 +287,17 @@ export default function Home() {
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.26, ease: "easeOut" }}
-            className="mt-12 flex flex-col items-center gap-5"
+            className="mt-10 flex flex-col items-center gap-6"
           >
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button className="h-11 rounded-md px-6" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>Quero vender para todo o Brasil</Button>
-              <Button variant="secondary" className="h-11 rounded-md px-6" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <Button className="h-12 rounded-full px-8 text-sm font-bold shadow-[0_20px_40px_-10px_rgba(239,98,83,0.3)] hover:shadow-[0_25px_50px_-8px_rgba(239,98,83,0.4)] transition-all duration-300" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
+                Quero vender para todo o Brasil
+              </Button>
+              <Button variant="secondary" className="h-12 rounded-full px-8 text-sm font-bold border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
                 Falar com um especialista <ArrowRight className="size-4" />
               </Button>
             </div>
-            <p className="mt-2 max-w-2xl text-center text-sm font-medium leading-relaxed text-white/60">
+            <p className="mt-2 max-w-2xl text-center text-sm leading-relaxed text-white/50">
               Transforme seu estoque parado em uma máquina de vendas nacional. Nós assumimos toda a sua operação digital para você focar no que faz de melhor: administrar o seu negócio.
             </p>
           </motion.div>
@@ -396,90 +469,212 @@ function ProblemCard({ item, index }: { item: PainPoint; index: number }) {
   const Icon = item.icon;
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 24 }}
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.55, delay: index * 0.055, ease: "easeOut" }}
-      className="group relative overflow-hidden rounded-lg border border-white/10 bg-[#0a0b0f]/86 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.34),inset_0_1px_0_rgba(255,255,255,0.06)]"
+      transition={{ duration: 0.6, delay: index * 0.06, ease: "easeOut" }}
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/18 to-transparent opacity-70" />
-      <div className="absolute -right-14 -top-16 size-32 rounded-full bg-[#f4c95d]/[0.07] blur-2xl transition-opacity group-hover:opacity-80" />
+      <TiltCard className="group h-full">
+        <div className="relative p-6 h-full flex flex-col justify-between">
+          <div className="absolute -right-10 -top-10 size-24 rounded-full bg-[#f4c95d]/[0.05] blur-2xl pointer-events-none" />
+          
+          <div>
+            <div className="mb-6 flex items-center justify-between gap-4">
+              <span className="grid size-11 place-items-center rounded-lg border border-white/10 bg-white/[0.03] text-[#f4c95d] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-colors group-hover:border-[#f4c95d]/30 group-hover:bg-[#f4c95d]/5">
+                <Icon className="size-5" />
+              </span>
+              <span className="rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-400">
+                {item.metric}
+              </span>
+            </div>
 
-      <div className="mb-8 flex items-center justify-between gap-4">
-        <span className="grid size-11 place-items-center rounded-md border border-white/10 bg-white/[0.055] text-[#f4c95d] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-          <Icon className="size-5" />
-        </span>
-        <span className="rounded-md border border-red-400/15 bg-red-500/[0.07] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-red-200/76">
-          {item.metric}
-        </span>
-      </div>
-
-      <h3 className="text-xl font-semibold tracking-[-0.045em] text-white">{item.title}</h3>
-      <p className="mt-3 text-sm leading-6 text-white/50">{item.text}</p>
-    </motion.article>
+            <h3 className="text-lg font-display font-bold tracking-tight text-white">{item.title}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-white/50 group-hover:text-white/70 transition-colors">{item.text}</p>
+          </div>
+        </div>
+      </TiltCard>
+    </motion.div>
   );
 }
 
 function DiagnosticPanel() {
   return (
-    <div className="relative flex min-h-full flex-col overflow-hidden rounded-lg border border-white/10 bg-[#0b0c10] p-5 shadow-[0_36px_120px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)] sm:p-6">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_18%,rgba(244,201,93,0.12),transparent_28%),linear-gradient(145deg,rgba(255,255,255,0.075),transparent_34%)]" />
-      <div className="relative flex items-center justify-between border-b border-white/10 pb-5">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/38">painel da loja</p>
-          <h3 className="mt-2 text-2xl font-semibold tracking-[-0.055em] text-white">Sinais que travam crescimento</h3>
-        </div>
-        <span className="hidden rounded-md border border-[#f4c95d]/20 bg-[#f4c95d]/10 px-3 py-1.5 text-xs font-semibold text-[#f4c95d] sm:inline-flex">
-          Ao vivo
-        </span>
-      </div>
+    <TiltCard className="h-full">
+      <div className="relative flex h-full flex-col p-6 sm:p-8 overflow-hidden">
+        {/* Cyber Grid background */}
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:16px_16px] [mask-image:radial-gradient(ellipse_at_center,black_70%,transparent_100%)] opacity-80" />
+        
+        {/* Glow corner */}
+        <div className="absolute -left-16 -top-16 size-48 rounded-full bg-red-500/[0.03] blur-3xl pointer-events-none" />
+        <div className="absolute -right-16 -bottom-16 size-48 rounded-full bg-[#f4c95d]/[0.03] blur-3xl pointer-events-none" />
 
-      <div className="relative mt-6 space-y-3">
-        {diagnosticRows.map((row) => (
-          <div
-            key={row.label}
-            className="grid grid-cols-[1fr_auto] items-center gap-4 rounded-lg border border-white/10 bg-black/24 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
-          >
-            <div>
-              <div className="text-sm font-medium text-white/78">{row.label}</div>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/[0.08]">
-                <div
-                  className={cn(
-                    "h-full rounded-full",
-                    row.tone === "danger" ? "w-[76%] bg-red-400" : "w-[58%] bg-[#f4c95d]",
-                  )}
-                />
+        <div className="relative flex items-center justify-between border-b border-white/10 pb-5">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-[#f4c95d]">DIAGNOSTIC SYSTEM</p>
+            <h3 className="mt-2 text-2xl font-display font-bold tracking-tight text-white">Vazamento de Vendas</h3>
+          </div>
+          <span className="flex items-center gap-1.5 rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-xs font-bold text-red-400">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            </span>
+            Crítico
+          </span>
+        </div>
+
+        <div className="relative mt-6 space-y-4">
+          {diagnosticRows.map((row) => (
+            <div
+              key={row.label}
+              className="grid grid-cols-[1fr_auto] items-center gap-4 rounded-xl border border-white/5 bg-white/[0.01] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] hover:border-white/10 transition-colors"
+            >
+              <div>
+                <div className="text-sm font-semibold text-white/70">{row.label}</div>
+                <div className="mt-3.5 h-2 overflow-hidden rounded-full bg-white/[0.04]">
+                  <motion.div
+                    className={cn(
+                      "h-full rounded-full",
+                      row.tone === "danger" ? "bg-gradient-to-r from-red-500 to-rose-400" : "bg-gradient-to-r from-[#f4c95d] to-amber-300"
+                    )}
+                    initial={{ width: 0 }}
+                    whileInView={{ width: row.tone === "danger" ? "76%" : "58%" }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+                  />
+                </div>
+              </div>
+              <div className={cn("text-2xl font-display font-extrabold tracking-tight", row.tone === "danger" ? "text-red-400" : "text-[#f4c95d]")}>
+                {row.value}
               </div>
             </div>
-            <div className={cn("text-2xl font-semibold tracking-[-0.05em]", row.tone === "danger" ? "text-red-300" : "text-[#f4c95d]")}>
-              {row.value}
+          ))}
+        </div>
+
+        <div className="relative mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-xl border border-white/5 bg-white/[0.01] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-white/30">Visibilidade Geral</div>
+            <div className="mt-2.5 flex items-end gap-2">
+              <span className="text-3xl font-display font-extrabold text-white">18%</span>
+              <span className="pb-0.5 text-xs font-bold text-red-400">Péssima</span>
             </div>
           </div>
-        ))}
-      </div>
-
-      <div className="relative mt-5 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border border-white/10 bg-white/[0.035] p-4">
-          <div className="text-[11px] uppercase tracking-[0.16em] text-white/34">visibilidade</div>
-          <div className="mt-3 flex items-end gap-2">
-            <span className="text-4xl font-semibold tracking-[-0.06em] text-white">18%</span>
-            <span className="pb-1 text-xs font-medium text-red-300">abaixo</span>
+          <div className="rounded-xl border border-white/5 bg-white/[0.01] p-4">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-white/30">Tempo de Cadastro</div>
+            <div className="mt-2.5 flex items-end gap-2">
+              <span className="text-3xl font-display font-extrabold text-white">6 horas</span>
+              <span className="pb-0.5 text-xs font-bold text-white/42">Por lote</span>
+            </div>
           </div>
         </div>
-        <div className="rounded-lg border border-white/10 bg-white/[0.035] p-4">
-          <div className="text-[11px] uppercase tracking-[0.16em] text-white/34">cadastro</div>
-          <div className="mt-3 flex items-end gap-2">
-            <span className="text-4xl font-semibold tracking-[-0.06em] text-white">6h</span>
-            <span className="pb-1 text-xs font-medium text-white/42">por lote</span>
-          </div>
+
+        <div className="relative mt-8 pt-4">
+          <Button className="h-12 w-full rounded-lg text-base font-bold shadow-[0_20px_40px_-10px_rgba(239,98,83,0.3)] hover:shadow-[0_25px_50px_-8px_rgba(239,98,83,0.4)] transition-all duration-300" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
+            Quero estancar minhas perdas <ArrowRight className="size-4" />
+          </Button>
         </div>
       </div>
+    </TiltCard>
+  );
+}
 
-      <div className="relative mt-auto pt-6">
-        <Button className="h-11 w-full rounded-md" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
-          Quero encontrar essas perdas <ArrowRight className="size-4" />
-        </Button>
+function ShowcaseComparison() {
+  const [activeTab, setActiveTab] = useState<'before' | 'after'>('after');
+
+  return (
+    <div className="relative flex flex-col rounded-2xl border border-white/10 bg-[#07080c]/90 p-5 shadow-[0_45px_100px_-20px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.06)] overflow-hidden sm:p-6">
+      {/* Glow effect */}
+      <div className="absolute -right-24 -top-24 size-48 rounded-full bg-[#f4c95d]/[0.04] blur-3xl pointer-events-none" />
+      
+      {/* Tabs */}
+      <div className="flex gap-2 rounded-full bg-white/[0.03] p-1 border border-white/5">
+        <button
+          onClick={() => setActiveTab('before')}
+          className={cn(
+            "flex-1 h-9 rounded-full text-xs font-bold transition-all cursor-pointer",
+            activeTab === 'before' ? "bg-red-500/10 border border-red-500/20 text-red-400" : "text-white/40 hover:text-white/70"
+          )}
+        >
+          Anúncio Comum (Antes)
+        </button>
+        <button
+          onClick={() => setActiveTab('after')}
+          className={cn(
+            "flex-1 h-9 rounded-full text-xs font-bold transition-all cursor-pointer",
+            activeTab === 'after' ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.1)]" : "text-white/40 hover:text-white/70"
+          )}
+        >
+          Otimizado Melo (Depois)
+        </button>
+      </div>
+
+      {/* Showcase Area */}
+      <div className="mt-6 min-h-[300px] flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.01] p-4 relative">
+        {activeTab === 'before' ? (
+          <motion.div
+            key="before"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-4"
+          >
+            <div className="flex justify-between items-center text-[10px] text-red-400 font-bold uppercase tracking-wider">
+              <span>Sem Visibilidade</span>
+              <span>R$ 180,00</span>
+            </div>
+            <div className="rounded-lg border border-dashed border-red-500/20 bg-red-950/5 p-4 flex gap-4 items-center">
+              <div className="size-16 shrink-0 rounded bg-white/[0.02] border border-white/5 flex items-center justify-center text-white/20 text-xs font-semibold">
+                Sem Foto
+              </div>
+              <div className="space-y-2 flex-1">
+                <div className="h-4 bg-white/10 rounded w-3/4 animate-pulse" />
+                <div className="h-3 bg-white/5 rounded w-1/2" />
+              </div>
+            </div>
+            <div className="space-y-2.5 text-xs text-white/40 leading-relaxed font-medium">
+              <p>🔴 Título cru: "piston gol 1.6 ap"</p>
+              <p>🔴 Ficha técnica vazia (gera devoluções e dúvidas)</p>
+              <p>🔴 Fotos amadoras tiradas no balcão da loja</p>
+              <p>🔴 Sem suporte pré-venda rápido nas perguntas</p>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="after"
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-4"
+          >
+            <div className="flex justify-between items-center text-[10px] text-emerald-400 font-bold uppercase tracking-wider">
+              <span>Exposição Máxima (Full/Coleta)</span>
+              <span>R$ 245,00 (Maior Lucro)</span>
+            </div>
+            <div className="rounded-lg border border-emerald-500/20 bg-emerald-950/10 p-4 flex gap-4 items-center shadow-[inset_0_1px_0_rgba(255,255,255,0.02),0_10px_30px_rgba(16,185,129,0.05)]">
+              <div className="size-16 shrink-0 rounded bg-[#f4c95d]/5 border border-[#f4c95d]/20 flex items-center justify-center text-[#f4c95d] font-bold text-xs">
+                HD Foto
+              </div>
+              <div className="space-y-2 flex-1">
+                <div className="h-4 bg-white/20 rounded w-full" />
+                <div className="h-3 bg-[#f4c95d]/20 rounded w-1/3" />
+              </div>
+            </div>
+            <div className="space-y-2.5 text-xs text-white/70 leading-relaxed font-medium">
+              <p>🟢 Título profissional otimizado por algoritmo de busca</p>
+              <p>🟢 Ficha técnica 100% preenchida com códigos cruzados</p>
+              <p>🟢 Fotos profissionais editadas com fundo branco</p>
+              <p>🟢 Respostas automatizadas e plantão de dúvidas</p>
+            </div>
+          </motion.div>
+        )}
+      </div>
+
+      <div className="mt-6 border-t border-white/5 pt-5 text-center">
+        <p className="text-xs text-white/40 leading-relaxed">
+          Nós organizamos todo o seu catálogo digital de autopeças de forma a atrair a demanda nacional do Mercado Livre de forma automatizada.
+        </p>
       </div>
     </div>
   );
@@ -500,14 +695,14 @@ function DigitalOperationSection() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="max-w-5xl"
         >
-          <div className="mb-6 flex w-fit items-center gap-2 rounded-md border border-white/10 bg-white/[0.055] px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/58 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+          <div className="mb-6 flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.055] px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
             <Sparkles className="size-3.5 text-[#f4c95d]" />
             Operação digital completa
           </div>
-          <h2 className="max-w-5xl text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-white sm:text-6xl lg:text-[72px]">
+          <h2 className="max-w-5xl text-balance text-4xl font-display font-extrabold leading-[0.98] tracking-[-0.04em] text-white sm:text-6xl lg:text-[72px]">
             Nós assumimos o volante da sua operação no Mercado Livre.
           </h2>
-          <p className="mt-6 max-w-2xl text-pretty text-base leading-7 text-white/52 sm:text-lg">
+          <p className="mt-6 max-w-2xl text-pretty text-base leading-relaxed text-white/52">
             Da criação do anúncio perfeito até a análise de métricas, entregamos um fluxo validado e contínuo para escalar seu faturamento.
           </p>
         </motion.div>
@@ -533,34 +728,9 @@ function DigitalOperationSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-120px" }}
             transition={{ duration: 0.75, delay: 0.08, ease: "easeOut" }}
-            className="relative overflow-hidden rounded-lg border border-white/10 bg-[#0b0c10]/90 p-6 shadow-[0_36px_120px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.08)] sm:p-8"
+            className="relative"
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_20%,rgba(244,201,93,0.12),transparent_32%),linear-gradient(145deg,rgba(255,255,255,0.055),transparent_36%)]" />
-            <div className="relative">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/38">como funciona</p>
-              <h3 className="mt-3 text-3xl font-semibold leading-tight tracking-[-0.055em] text-white sm:text-4xl">
-                Um fluxo completo para transformar peças em anúncios que vendem.
-              </h3>
-              <div className="mt-8 space-y-4">
-                {[
-                  "Recebemos seus dados e organizamos todo o seu catálogo de forma inteligente.",
-                  "Criamos títulos magnéticos, fotos padronizadas e descrições impecáveis.",
-                  "Monitoramos os resultados diariamente para encontrar novas oportunidades de lucro.",
-                ].map((item, index) => (
-                  <div key={item} className="flex gap-4 rounded-lg border border-white/10 bg-black/20 p-4">
-                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-[#f4c95d] text-xs font-bold text-black">
-                      {index + 1}
-                    </span>
-                    <p className="text-sm leading-6 text-white/64">{item}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-8 border-t border-white/10 pt-6">
-                <Button className="h-11 rounded-md px-5" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
-                  Quero estruturar minha operação agora <ArrowRight className="size-4" />
-                </Button>
-              </div>
-            </div>
+            <ShowcaseComparison />
           </motion.div>
         </div>
       </div>
@@ -580,8 +750,8 @@ function OperationStep({ step, index }: { step: OperationStep; index: number }) 
         {String(index + 1).padStart(2, "0")}
       </div>
       <div className="pb-2">
-        <h3 className="text-2xl font-semibold tracking-[-0.05em] text-white">{step.title}</h3>
-        <p className="mt-2 max-w-xl text-sm leading-6 text-white/52 sm:text-base">{step.text}</p>
+        <h3 className="text-xl font-display font-bold tracking-tight text-white">{step.title}</h3>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/52">{step.text}</p>
       </div>
     </motion.div>
   );
@@ -602,31 +772,20 @@ function SocialProofSection() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="mx-auto max-w-5xl text-center"
         >
-          <div className="mx-auto mb-6 flex w-fit items-center gap-2 rounded-md border border-white/10 bg-white/[0.055] px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/58 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+          <div className="mx-auto mb-6 flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.055] px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-white/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
             <TrendingUp className="size-3.5 text-[#f4c95d]" />
             prova social
           </div>
-          <h2 className="text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-white sm:text-6xl lg:text-[72px]">
+          <h2 className="text-balance text-4xl font-display font-extrabold leading-[0.98] tracking-[-0.04em] text-white sm:text-6xl lg:text-[72px]">
             Autopeças que saíram do estoque parado para o topo das buscas.
           </h2>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 34 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-120px" }}
-          transition={{ duration: 0.75, delay: 0.08, ease: "easeOut" }}
-          className="relative mt-14 overflow-hidden rounded-lg border border-white/10 bg-[#0b0c10]/92 shadow-[0_36px_120px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)]"
-        >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(244,201,93,0.14),transparent_32%),radial-gradient(circle_at_82%_48%,rgba(47,109,255,0.1),transparent_32%),linear-gradient(145deg,rgba(255,255,255,0.055),transparent_40%)]" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#f4c95d]/45 to-transparent" />
-
-          <div className="relative grid divide-y divide-white/10 lg:grid-cols-3 lg:divide-x lg:divide-y-0">
-            {socialProofStats.map((stat, index) => (
-              <SocialProofCounter key={stat.label} stat={stat} index={index} />
-            ))}
-          </div>
-        </motion.div>
+        <div className="mt-14 grid gap-6 md:grid-cols-3">
+          {socialProofStats.map((stat, index) => (
+            <SocialProofCounter key={stat.label} stat={stat} index={index} />
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -679,28 +838,31 @@ function SocialProofCounter({ stat, index }: { stat: SocialProofStat; index: num
   const displayValue = stat.value >= 100 ? Math.round(count).toLocaleString("pt-BR") : count.toFixed(0);
 
   return (
-    <div ref={ref} className="relative min-h-[250px] p-6 sm:p-8 lg:p-10">
-      <div className="absolute inset-0 opacity-0 transition-opacity duration-500 hover:opacity-100 bg-[radial-gradient(circle_at_center,rgba(244,201,93,0.08),transparent_58%)]" />
-      <div className="relative flex h-full flex-col justify-between gap-8">
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/32">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <span className="h-px flex-1 bg-gradient-to-r from-white/16 to-transparent" />
-        </div>
-
-        <div>
-          <div className="flex items-end gap-1 text-[64px] font-semibold leading-none tracking-[-0.08em] text-white sm:text-[82px]">
-            {stat.prefix && <span className="pb-3 text-[0.46em] text-[#f4c95d]">{stat.prefix}</span>}
-            <span className="bg-[linear-gradient(110deg,#ffffff_0%,#f4c95d_45%,#ffffff_100%)] bg-clip-text text-transparent drop-shadow-[0_0_34px_rgba(244,201,93,0.14)]">
-              {displayValue}
+    <div ref={ref} className="relative min-h-[250px]">
+      <TiltCard className="h-full">
+        <div className="relative flex h-full flex-col justify-between p-8 sm:p-10 gap-8">
+          <div className="absolute -left-10 -top-10 size-24 rounded-full bg-[#f4c95d]/[0.03] blur-2xl pointer-events-none" />
+          
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-white/32">
+              {String(index + 1).padStart(2, "0")}
             </span>
-            {stat.suffix && <span className="pb-3 text-[0.46em] text-[#f4c95d]">{stat.suffix}</span>}
+            <span className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent" />
           </div>
-          <h3 className="mt-3 text-xl font-semibold tracking-[-0.04em] text-white">{stat.label}</h3>
-          <p className="mt-3 max-w-xs text-sm leading-6 text-white/48">{stat.description}</p>
+
+          <div>
+            <div className="flex items-end gap-1 text-[60px] font-display font-extrabold leading-none tracking-[-0.05em] text-white sm:text-[76px]">
+              {stat.prefix && <span className="pb-2 text-[0.4em] text-[#f4c95d]">{stat.prefix}</span>}
+              <span className="bg-gradient-to-r from-white via-[#f4c95d] to-[#ffe600] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(244,201,93,0.15)]">
+                {displayValue}
+              </span>
+              {stat.suffix && <span className="pb-2 text-[0.4em] text-[#f4c95d]">{stat.suffix}</span>}
+            </div>
+            <h3 className="mt-3 text-lg font-display font-bold text-white">{stat.label}</h3>
+            <p className="mt-3 text-sm leading-relaxed text-white/40">{stat.description}</p>
+          </div>
         </div>
-      </div>
+      </TiltCard>
     </div>
   );
 }
@@ -916,19 +1078,11 @@ const trustSignals = [
 function FinalCTASection() {
   return (
     <section className="relative isolate overflow-hidden px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
-      {/* --- Background: layered radials, top divider, animated glow --- */}
       <div className="absolute inset-0 -z-20 bg-[linear-gradient(180deg,#030304_0%,#0a0b10_42%,#030304_100%)]" />
       <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent" />
-      <div className="absolute left-1/2 top-0 -z-10 h-[600px] w-[90vw] -translate-x-1/2 bg-[radial-gradient(ellipse_at_50%_0%,rgba(239,98,83,0.18),transparent_58%)] blur-3xl" />
-      <motion.div
-        aria-hidden="true"
-        animate={{ opacity: [0.12, 0.28, 0.12], scale: [1, 1.06, 1] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute right-[-8%] top-1/4 -z-10 h-[380px] w-[380px] rounded-full bg-[radial-gradient(circle,rgba(244,201,93,0.22),transparent_60%)] blur-3xl"
-      />
+      <div className="absolute left-1/2 top-0 -z-10 h-[600px] w-[90vw] -translate-x-1/2 bg-[radial-gradient(ellipse_at_50%_0%,rgba(239,98,83,0.14),transparent_58%)] blur-3xl" />
 
       <div className="mx-auto max-w-6xl">
-        {/* --- Header area --- */}
         <motion.div
           initial={{ opacity: 0, y: 26 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -936,124 +1090,118 @@ function FinalCTASection() {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="mx-auto max-w-4xl text-center"
         >
-          <div className="mx-auto mb-6 flex w-fit items-center gap-2 rounded-md border border-primary/25 bg-primary/[0.08] px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary shadow-[inset_0_1px_0_rgba(239,98,83,0.15)]">
+          <div className="mx-auto mb-6 flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary">
             <Send className="size-3.5" />
             Pronto para escalar?
           </div>
-          <h2 className="text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-white sm:text-6xl lg:text-[70px]">
+          <h2 className="text-balance text-4xl font-display font-extrabold leading-[0.98] tracking-[-0.04em] text-white sm:text-6xl lg:text-[70px]">
             Desbloqueie o potencial da sua{" "}
-            <span className="font-script inline-block bg-[linear-gradient(110deg,#ffffff_0%,#f4c95d_38%,#ef6253_68%,#ffffff_100%)] bg-[length:220%_100%] bg-clip-text px-1 italic text-transparent">
+            <span className="font-script inline-block bg-gradient-to-r from-white via-[#f4c95d] to-[#ffe600] bg-clip-text text-transparent px-1 italic">
               autopeça
             </span>{" "}
             no Mercado Livre.
           </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-7 text-white/52 sm:text-lg">
+          <p className="mx-auto mt-6 max-w-2xl text-pretty text-base leading-relaxed text-white/52">
             Solicite seu diagnóstico gratuito e descubra quanto faturamento você está deixando na mesa. Sem compromisso, sem burocracia.
           </p>
         </motion.div>
 
-        {/* --- Asymmetric Grid: Form Card + Trust Stack --- */}
-        <div className="mt-16 grid items-start gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
-
-          {/* --- Left: Form Card with offset float --- */}
+        <div className="mt-16 grid items-stretch gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
+          {/* Left Form: wrapped in TiltCard */}
           <motion.div
-            initial={{ opacity: 0, y: 38, rotate: -0.6 }}
-            whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+            initial={{ opacity: 0, y: 38 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative"
           >
-            {/* Decorative corner accent */}
-            <div className="absolute -left-3 -top-3 size-24 rounded-full bg-primary/20 blur-2xl" />
-            <div className="absolute -bottom-4 -right-4 size-32 rounded-full bg-[#f4c95d]/10 blur-2xl" />
+            <TiltCard className="h-full">
+              <div className="relative p-6 sm:p-8">
+                {/* Accent glows */}
+                <div className="absolute -left-12 -top-12 size-36 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-12 -right-12 size-36 rounded-full bg-[#f4c95d]/5 blur-3xl pointer-events-none" />
 
-            <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#0b0c10]/90 p-6 shadow-[0_36px_120px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.08)] sm:p-8">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(239,98,83,0.12),transparent_40%),linear-gradient(145deg,rgba(255,255,255,0.06),transparent_32%)]" />
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-
-              <div className="relative">
-                {/* Form header with live indicator */}
-                <div className="mb-8 flex items-center justify-between">
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/38">diagnóstico</p>
-                    <h3 className="mt-2 text-2xl font-semibold tracking-[-0.055em] text-white sm:text-3xl">
-                      Solicite sua análise
-                    </h3>
+                <div className="relative">
+                  <div className="mb-8 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#f4c95d]">DIAGNÓSTICO</p>
+                      <h3 className="mt-2 text-2xl font-display font-bold tracking-tight text-white">
+                        Solicite sua análise
+                      </h3>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-bold text-emerald-400">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+                      </span>
+                      Vagas abertas
+                    </span>
                   </div>
-                  <span className="hidden items-center gap-2 rounded-md border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 sm:inline-flex">
-                    <motion.span
-                      animate={{ opacity: [1, 0.3, 1] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                      className="size-1.5 rounded-full bg-emerald-400"
-                    />
-                    Vagas abertas
-                  </span>
+
+                  <form className="space-y-5">
+                    <div>
+                      <label htmlFor="cta-store" className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/40">
+                        Nome da sua loja
+                      </label>
+                      <input
+                        id="cta-store"
+                        type="text"
+                        placeholder="Ex: Autopeças Silva"
+                        className="h-12 w-full rounded-lg border border-white/10 bg-white/[0.02] px-4 text-sm text-white placeholder:text-white/20 outline-none transition-all focus:border-[#f4c95d]/40 focus:bg-white/[0.04] focus:ring-1 focus:ring-[#f4c95d]/20"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="cta-whatsapp" className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/40">
+                        WhatsApp
+                      </label>
+                      <input
+                        id="cta-whatsapp"
+                        type="tel"
+                        placeholder="(00) 00000-0000"
+                        className="h-12 w-full rounded-lg border border-white/10 bg-white/[0.02] px-4 text-sm text-white placeholder:text-white/20 outline-none transition-all focus:border-[#f4c95d]/40 focus:bg-white/[0.04] focus:ring-1 focus:ring-[#f4c95d]/20"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="cta-qty" className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-white/40">
+                        Quantas peças você tem em estoque?
+                      </label>
+                      <div className="relative">
+                        <select
+                          id="cta-qty"
+                          className="h-12 w-full cursor-pointer appearance-none rounded-lg border border-white/10 bg-[#07080c] px-4 text-sm text-white/60 outline-none transition-all focus:border-[#f4c95d]/40 focus:bg-white/[0.04] focus:ring-1 focus:ring-[#f4c95d]/20"
+                          defaultValue=""
+                        >
+                          <option value="" disabled>Selecione uma faixa</option>
+                          <option value="small">Até 500 peças</option>
+                          <option value="medium">500 – 2.000 peças</option>
+                          <option value="large">2.000 – 10.000 peças</option>
+                          <option value="enterprise">Mais de 10.000 peças</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <Button type="button" className="h-12 w-full rounded-lg text-base font-bold shadow-[0_20px_40px_-10px_rgba(239,98,83,0.3)] hover:shadow-[0_25px_50px_-8px_rgba(239,98,83,0.4)] transition-all duration-300" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
+                        Quero meu diagnóstico gratuito <ArrowRight className="size-4" />
+                      </Button>
+                    </div>
+                  </form>
+
+                  <p className="mt-5 text-center text-xs text-white/32">
+                    Mais de 130 lojas de autopeças já aceleram suas vendas com a Melo Mídia.
+                  </p>
                 </div>
-
-                {/* Form fields */}
-                <form action="#" className="space-y-4">
-                  <div>
-                    <label htmlFor="cta-store" className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-white/42">
-                      Nome da sua loja
-                    </label>
-                    <input
-                      id="cta-store"
-                      type="text"
-                      placeholder="Ex: Autopeças Silva"
-                      className="h-12 w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 text-sm text-white placeholder:text-white/28 outline-none transition-colors focus:border-primary/50 focus:bg-white/[0.06] focus:ring-1 focus:ring-primary/25"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="cta-whatsapp" className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-white/42">
-                      WhatsApp
-                    </label>
-                    <input
-                      id="cta-whatsapp"
-                      type="tel"
-                      placeholder="(00) 00000-0000"
-                      className="h-12 w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 text-sm text-white placeholder:text-white/28 outline-none transition-colors focus:border-primary/50 focus:bg-white/[0.06] focus:ring-1 focus:ring-primary/25"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="cta-qty" className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-white/42">
-                      Quantas peças você tem em estoque?
-                    </label>
-                    <select
-                      id="cta-qty"
-                      className="h-12 w-full cursor-pointer appearance-none rounded-lg border border-white/10 bg-white/[0.04] px-4 text-sm text-white/60 outline-none transition-colors focus:border-primary/50 focus:bg-white/[0.06] focus:ring-1 focus:ring-primary/25"
-                      defaultValue=""
-                    >
-                      <option value="" disabled>Selecione uma faixa</option>
-                      <option value="small">Até 500 peças</option>
-                      <option value="medium">500 – 2.000 peças</option>
-                      <option value="large">2.000 – 10.000 peças</option>
-                      <option value="enterprise">Mais de 10.000 peças</option>
-                    </select>
-                  </div>
-
-                  <div className="pt-2">
-                    <Button type="button" className="h-12 w-full rounded-lg px-6 text-base" onClick={() => window.open('https://wa.me/5562994561229', '_blank')}>
-                      Quero meu diagnóstico gratuito <ArrowRight className="size-4" />
-                    </Button>
-                  </div>
-                </form>
-
-                <p className="mt-5 text-center text-xs leading-5 text-white/32">
-                  Mais de 130 lojas de autopeças já aceleram suas vendas com a Melo Mídia.
-                </p>
               </div>
-            </div>
+            </TiltCard>
           </motion.div>
 
-          {/* --- Right: Trust signals + visual element --- */}
+          {/* Right Trust signals: wrapped in individual TiltCards */}
           <motion.div
             initial={{ opacity: 0, x: 28 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.75, delay: 0.12, ease: "easeOut" }}
-            className="flex flex-col gap-5"
+            className="flex flex-col gap-4"
           >
-            {/* Trust signal cards */}
             {trustSignals.map((signal, index) => {
               const Icon = signal.icon;
               return (
@@ -1062,51 +1210,50 @@ function FinalCTASection() {
                   initial={{ opacity: 0, x: 18 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: "-80px" }}
-                  transition={{ duration: 0.5, delay: 0.08 + index * 0.07, ease: "easeOut" }}
-                  className="group relative flex items-center gap-5 overflow-hidden rounded-lg border border-white/10 bg-[#0b0c10]/80 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition-colors hover:border-white/16 hover:bg-[#0d0e13]"
+                  transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
                 >
-                  <div className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100 bg-[radial-gradient(circle_at_0%_50%,rgba(244,201,93,0.06),transparent_60%)]" />
-                  <span className="relative grid size-12 shrink-0 place-items-center rounded-lg border border-[#f4c95d]/20 bg-[#f4c95d]/[0.08] text-[#f4c95d] shadow-[0_0_24px_rgba(244,201,93,0.1)]">
-                    <Icon className="size-5" />
-                  </span>
-                  <div className="relative">
-                    <h4 className="text-base font-semibold tracking-[-0.03em] text-white">{signal.text}</h4>
-                    <p className="mt-1 text-sm text-white/42">
-                      {index === 0 && "Analisamos seus anúncios, concorrência e oportunidades sem custo."}
-                      {index === 1 && "Você decide se quer seguir depois de ver o diagnóstico completo."}
-                      {index === 2 && "Nosso time entra em contato rápido para entender sua loja."}
-                      {index === 3 && "Cada autopeça recebe uma estratégia sob medida para o Mercado Livre."}
-                    </p>
-                  </div>
-                  <CheckCircle2 className="relative ml-auto size-5 shrink-0 text-white/12 transition-colors group-hover:text-[#f4c95d]/60" />
+                  <TiltCard className="group">
+                    <div className="relative flex items-center gap-5 p-5">
+                      <span className="grid size-12 shrink-0 place-items-center rounded-lg border border-[#f4c95d]/20 bg-[#f4c95d]/[0.04] text-[#f4c95d] shadow-[0_0_20px_rgba(244,201,93,0.05)] transition-colors group-hover:bg-[#f4c95d]/10">
+                        <Icon className="size-5" />
+                      </span>
+                      <div>
+                        <h4 className="text-base font-display font-bold text-white">{signal.text}</h4>
+                        <p className="mt-1 text-xs leading-relaxed text-white/40">
+                          {index === 0 && "Analisamos seus anúncios, concorrência e oportunidades sem custo."}
+                          {index === 1 && "Você decide se quer seguir depois de ver o diagnóstico completo."}
+                          {index === 2 && "Nosso time entra em contato rápido para entender sua loja."}
+                          {index === 3 && "Cada autopeça recebe uma estratégia sob medida para o Mercado Livre."}
+                        </p>
+                      </div>
+                    </div>
+                  </TiltCard>
                 </motion.div>
               );
             })}
 
-            {/* Floating mini-metric card */}
+            {/* Bottom floating micro card */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-              className="relative overflow-hidden rounded-lg border border-white/10 bg-[#0b0c10]/80 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
             >
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(239,98,83,0.08),transparent_50%)]" />
-              <div className="relative flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/34">média dos clientes</p>
-                  <div className="mt-2 flex items-end gap-2">
-                    <span className="text-3xl font-semibold tracking-[-0.06em] text-white">+340%</span>
-                    <span className="pb-1 text-xs font-medium text-emerald-400">em vendas</span>
+              <TiltCard>
+                <div className="relative flex items-center justify-between gap-4 p-5">
+                  <div className="absolute -right-10 -top-10 size-20 rounded-full bg-emerald-500/[0.03] blur-xl pointer-events-none" />
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-white/30">MÉDIA DOS CLIENTES</p>
+                    <div className="mt-2 flex items-end gap-2">
+                      <span className="text-3xl font-display font-extrabold text-white">+340%</span>
+                      <span className="pb-0.5 text-xs font-bold text-emerald-400">em faturamento</span>
+                    </div>
+                  </div>
+                  <div className="grid size-12 place-items-center rounded-full border border-white/5 bg-white/[0.02]">
+                    <TrendingUp className="size-5 text-[#f4c95d]" />
                   </div>
                 </div>
-                <div className="grid size-14 place-items-center rounded-full border border-white/10 bg-white/[0.04]">
-                  <TrendingUp className="size-6 text-[#f4c95d]" />
-                </div>
-              </div>
-              <p className="relative mt-3 text-xs leading-5 text-white/38">
-                Crescimento médio nos primeiros 6 meses de operação com a Melo Mídia.
-              </p>
+              </TiltCard>
             </motion.div>
           </motion.div>
         </div>

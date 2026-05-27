@@ -59,3 +59,29 @@ body {
 .font-script {
   font-family: Georgia, "Times New Roman", Times, serif;
 }
+
+@keyframes float-y-up {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes float-y-down {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+.animate-float-up {
+  animation: float-y-up 5s ease-in-out infinite;
+}
+
+.animate-float-down {
+  animation: float-y-down 5.5s ease-in-out infinite;
+}

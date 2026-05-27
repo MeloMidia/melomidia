@@ -1000,70 +1000,56 @@ function DashboardMockup() {
       </motion.div>
 
       {/* Floating 3D layered element 1: Sales / Conversão */}
-      <motion.div
-        className="absolute right-2 sm:-right-6 top-16 z-40 flex rounded-xl border border-emerald-500/20 bg-emerald-950/90 p-3 sm:p-4 shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-md items-center gap-2 sm:gap-3"
-        animate={isHovered ? {
-          x: (mouseX - 0.5) * 60 + 10,
-          y: (mouseY - 0.5) * 60,
-          z: 80,
-        } : {
-          x: 0,
-          y: [-4, 4, -4],
-          z: 40,
-        }}
-        transition={isHovered ? {
-          type: "spring",
-          stiffness: 200,
-          damping: 25,
-        } : {
-          y: {
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }
-        }}
-      >
-        <span className="grid size-8 sm:size-9 place-items-center rounded-full bg-emerald-500/20 text-emerald-400">
-          <TrendingUp className="size-4 sm:size-5" />
-        </span>
-        <div className="text-left">
-          <div className="text-[8px] sm:text-[9px] uppercase tracking-wider text-emerald-400/80 font-bold">Conversão</div>
-          <div className="text-sm sm:text-base font-extrabold text-white tracking-tight">+340%</div>
-        </div>
-      </motion.div>
+      <div className="absolute right-1 sm:-right-6 top-8 sm:top-16 z-40 scale-80 sm:scale-100 origin-right animate-float-up">
+        <motion.div
+          className="flex rounded-lg sm:rounded-xl border border-emerald-500/20 bg-emerald-950/90 p-2 sm:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-md items-center gap-1.5 sm:gap-3"
+          style={{ transformStyle: "preserve-3d" }}
+          animate={isHovered ? {
+            x: (mouseX - 0.5) * 40,
+            y: (mouseY - 0.5) * 40,
+            z: 60,
+          } : {
+            x: 0,
+            y: 0,
+            z: 0,
+          }}
+          transition={{ type: "spring", stiffness: 200, damping: 25 }}
+        >
+          <span className="grid size-7 sm:size-9 place-items-center rounded-full bg-emerald-500/20 text-emerald-400">
+            <TrendingUp className="size-3.5 sm:size-5" />
+          </span>
+          <div className="text-left">
+            <div className="text-[8px] sm:text-[9px] uppercase tracking-wider text-emerald-400/80 font-bold">Conversão</div>
+            <div className="text-xs sm:text-base font-extrabold text-white tracking-tight">+340%</div>
+          </div>
+        </motion.div>
+      </div>
 
       {/* Floating 3D layered element 2: Ads status */}
-      <motion.div
-        className="absolute left-2 sm:-left-10 bottom-20 z-40 flex rounded-xl border border-amber-500/20 bg-black/90 p-3 sm:p-4 shadow-[0_25px_60px_rgba(0,0,0,0.6)] backdrop-blur-md items-center gap-2 sm:gap-3"
-        animate={isHovered ? {
-          x: (mouseX - 0.5) * 80 - 10,
-          y: (mouseY - 0.5) * 80,
-          z: 100,
-        } : {
-          x: 0,
-          y: [4, -4, 4],
-          z: 50,
-        }}
-        transition={isHovered ? {
-          type: "spring",
-          stiffness: 180,
-          damping: 25,
-        } : {
-          y: {
-            duration: 5.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }
-        }}
-      >
-        <span className="grid size-8 sm:size-9 place-items-center rounded-full bg-[#f4c95d]/10 text-[#f4c95d]">
-          <Sparkles className="size-4 sm:size-5" />
-        </span>
-        <div className="text-left">
-          <div className="text-[8px] sm:text-[9px] uppercase tracking-wider text-white/40 font-bold">Anúncios</div>
-          <div className="text-xs sm:text-sm font-bold text-white">100% Otimizados</div>
-        </div>
-      </motion.div>
+      <div className="absolute left-1 sm:-left-10 bottom-12 sm:bottom-20 z-40 scale-80 sm:scale-100 origin-left animate-float-down">
+        <motion.div
+          className="flex rounded-lg sm:rounded-xl border border-amber-500/20 bg-black/90 p-2 sm:p-4 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-md items-center gap-1.5 sm:gap-3"
+          style={{ transformStyle: "preserve-3d" }}
+          animate={isHovered ? {
+            x: (mouseX - 0.5) * 50,
+            y: (mouseY - 0.5) * 50,
+            z: 70,
+          } : {
+            x: 0,
+            y: 0,
+            z: 0,
+          }}
+          transition={{ type: "spring", stiffness: 180, damping: 25 }}
+        >
+          <span className="grid size-7 sm:size-9 place-items-center rounded-full bg-[#f4c95d]/10 text-[#f4c95d]">
+            <Sparkles className="size-3.5 sm:size-5" />
+          </span>
+          <div className="text-left">
+            <div className="text-[8px] sm:text-[9px] uppercase tracking-wider text-white/40 font-bold">Anúncios</div>
+            <div className="text-xs sm:text-sm font-bold text-white">100% Otimizados</div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

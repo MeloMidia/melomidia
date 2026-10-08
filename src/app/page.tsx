@@ -244,8 +244,11 @@ export default function Home() {
         </motion.div>
 
         <header className="sticky top-4 z-50 mx-auto flex h-14 max-w-5xl items-center justify-between rounded-full border border-white/10 bg-[#08080c]/60 px-4 backdrop-blur-xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.08)]">
-          <a className="flex items-center gap-2 px-3" href="#">
-            <img src="/logo.png" alt="Melo Midia" className="h-9 w-9 rounded-full object-cover border border-white/20" />
+          <a className="flex items-center gap-2.5 px-3 group" href="#">
+            <img src="/logo.png" alt="Melo Mídia" className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />
+            <span className="font-display font-bold text-sm tracking-tight text-white hidden sm:inline-block">
+              MELO <span className="text-[#f4c95d]">MÍDIA</span>
+            </span>
           </a>
 
           <nav className="hidden items-center gap-8 text-xs font-bold uppercase tracking-wider text-white/60 md:flex">
@@ -319,6 +322,7 @@ export default function Home() {
       <DigitalOperationSection />
       <SocialProofSection />
       <FinalCTASection />
+      <Footer />
     </main>
   );
 }
@@ -1245,6 +1249,24 @@ function FinalCTASection() {
         </div>
       </div>
     </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="relative border-t border-white/10 bg-[#030304] px-4 py-12 text-white/50 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 sm:flex-row">
+        <a className="flex items-center gap-2.5 group" href="#">
+          <img src="/logo.png" alt="Melo Mídia" className="h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />
+          <span className="font-display font-bold text-base tracking-tight text-white">
+            MELO <span className="text-[#f4c95d]">MÍDIA</span>
+          </span>
+        </a>
+        <p className="text-xs text-center sm:text-right text-white/40">
+          © {new Date().getFullYear()} Melo Mídia. Todos os direitos reservados.
+        </p>
+      </div>
+    </footer>
   );
 }
 

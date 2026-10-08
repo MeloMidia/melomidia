@@ -18,6 +18,10 @@ export const metadata: Metadata = {
   title: "Melo Mídia - Mercado Livre para Autopeças",
   description:
     "Agência especializada em serviços de Mercado Livre para lojas de autopeças.",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/logo-icon.png",
+  },
 };
 
 export default function RootLayout({
